@@ -1,0 +1,10 @@
+node_modules/
+dist/
+dist-electron/
+release/
+*.log
+.DS_Store
+/tmp/
+tests/fixtures/*
+!tests/fixtures/README.md
+tests/output/
