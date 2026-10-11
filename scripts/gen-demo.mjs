@@ -48,7 +48,7 @@ async function render(name, fn, exif) {
   const file = path.join(OUT, `${name}.jpg`);
   await sharp(buf, { raw: { width: W, height: H, channels: 3 } })
     .jpeg({ quality: 92, chromaSubsampling: '4:4:4' })
-    .withExifMerge({ IFD0: { Make: exif.make, Model: exif.model, Artist: 'Lumora Studio demo', Copyright: 'Generated demo image, free to use', DateTime: exif.date }, IFD2: { ExposureTime: exif.shutter, FNumber: String(exif.f), ISOSpeedRatings: String(exif.iso), FocalLength: String(exif.focal), DateTimeOriginal: exif.date, LensModel: exif.lens } })
+    .withExifMerge({ IFD0: { Make: exif.make, Model: exif.model, Artist: 'PhotoStudio demo', Copyright: 'Generated demo image, free to use', DateTime: exif.date }, IFD2: { ExposureTime: exif.shutter, FNumber: String(exif.f), ISOSpeedRatings: String(exif.iso), FocalLength: String(exif.focal), DateTimeOriginal: exif.date, LensModel: exif.lens } })
     .toFile(file);
   console.log('wrote', path.relative(process.cwd(), file));
 }
@@ -155,12 +155,12 @@ const scenes = {
 };
 
 const exifs = {
-  'golden-coast': { make: 'Lumora', model: 'Demo Camera', lens: '24-70mm f/2.8', f: 8, shutter: '1/250', iso: 100, focal: 35, date: '2026:06:21 20:41:07' },
-  'forest-trail': { make: 'Lumora', model: 'Demo Camera', lens: '24-70mm f/2.8', f: 4, shutter: '1/60', iso: 800, focal: 28, date: '2026:05:02 09:12:44' },
-  'city-dusk': { make: 'Lumora', model: 'Demo Camera', lens: '35mm f/1.4', f: 2, shutter: '1/30', iso: 3200, focal: 35, date: '2026:01:14 17:55:30' },
-  'portrait-study': { make: 'Lumora', model: 'Demo Camera', lens: '85mm f/1.8', f: 1.8, shutter: '1/200', iso: 200, focal: 85, date: '2026:03:09 14:20:03' },
-  'alpine-lake': { make: 'Lumora', model: 'Demo Camera', lens: '16-35mm f/4', f: 11, shutter: '1/125', iso: 64, focal: 18, date: '2025:09:28 11:03:59' },
-  'teal-orange-reference': { make: 'Lumora', model: 'Demo Camera', lens: '50mm f/1.8', f: 2.8, shutter: '1/160', iso: 400, focal: 50, date: '2026:07:30 19:27:15' },
+  'golden-coast': { make: 'PhotoStudio', model: 'Demo Camera', lens: '24-70mm f/2.8', f: 8, shutter: '1/250', iso: 100, focal: 35, date: '2026:06:21 20:41:07' },
+  'forest-trail': { make: 'PhotoStudio', model: 'Demo Camera', lens: '24-70mm f/2.8', f: 4, shutter: '1/60', iso: 800, focal: 28, date: '2026:05:02 09:12:44' },
+  'city-dusk': { make: 'PhotoStudio', model: 'Demo Camera', lens: '35mm f/1.4', f: 2, shutter: '1/30', iso: 3200, focal: 35, date: '2026:01:14 17:55:30' },
+  'portrait-study': { make: 'PhotoStudio', model: 'Demo Camera', lens: '85mm f/1.8', f: 1.8, shutter: '1/200', iso: 200, focal: 85, date: '2026:03:09 14:20:03' },
+  'alpine-lake': { make: 'PhotoStudio', model: 'Demo Camera', lens: '16-35mm f/4', f: 11, shutter: '1/125', iso: 64, focal: 18, date: '2025:09:28 11:03:59' },
+  'teal-orange-reference': { make: 'PhotoStudio', model: 'Demo Camera', lens: '50mm f/1.8', f: 2.8, shutter: '1/160', iso: 400, focal: 50, date: '2026:07:30 19:27:15' },
 };
 
 fs.mkdirSync(OUT, { recursive: true });

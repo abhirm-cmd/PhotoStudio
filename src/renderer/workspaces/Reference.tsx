@@ -67,8 +67,8 @@ export function ReferenceWorkspace() {
 
   useEffect(() => {
     const onDrop = (e: Event) => chooseReference({ kind: 'file', path: (e as CustomEvent<string>).detail });
-    window.addEventListener('lumora:reference-drop', onDrop);
-    return () => window.removeEventListener('lumora:reference-drop', onDrop);
+    window.addEventListener('photostudio:reference-drop', onDrop);
+    return () => window.removeEventListener('photostudio:reference-drop', onDrop);
   }, [chooseReference]);
 
   const preview = useCallback((f: typeof fit, s: number) => {
@@ -244,7 +244,7 @@ function FittedValues({ base, graded, mode }: { base: EditParams; graded: EditPa
   return (
     <Section id="ref.values" title="Fitted settings" defaultOpen={false}>
       <div className="kv">{rows.map(([k, v]) => <React.Fragment key={k}><span className="text-1">{k}</span><span>{v}</span></React.Fragment>)}</div>
-      <p className="text-1 small">These are ordinary Lumora settings. After applying, every one can be changed in Develop.</p>
+      <p className="text-1 small">These are ordinary PhotoStudio settings. After applying, every one can be changed in Develop.</p>
     </Section>
   );
 }

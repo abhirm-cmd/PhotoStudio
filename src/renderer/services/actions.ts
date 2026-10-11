@@ -121,7 +121,7 @@ export const setGridColumns = (n: number) => { gridCols = Math.max(1, n); };
 const gridColumns = () => (app().workspace === 'library' && lib().view === 'grid' ? gridCols : 1);
 
 export function installShortcuts() {
-  const isMac = (window as any).lumora?.platform === 'darwin';
+  const isMac = (window as any).photostudio?.platform === 'darwin';
   window.addEventListener('keydown', e => {
     const t = e.target as HTMLElement;
     if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable)) return;

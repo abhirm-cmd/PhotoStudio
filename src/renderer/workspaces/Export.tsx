@@ -29,11 +29,11 @@ export function ExportWorkspace() {
       const [dir, list] = await Promise.all([api.exportDefaultDir(), api.exportPresetList()]);
       setPresets(list);
       let saved: ExportSettings | null = null;
-      try { saved = JSON.parse(localStorage.getItem('lumora.export') ?? 'null'); } catch { /* ignore */ }
+      try { saved = JSON.parse(localStorage.getItem('photostudio.export') ?? 'null'); } catch { /* ignore */ }
       setSettings(saved ? { ...defaultExportSettings(dir), ...saved } : defaultExportSettings(dir));
     })();
   }, []);
-  useEffect(() => { if (settings) try { localStorage.setItem('lumora.export', JSON.stringify(settings)); } catch { /* ignore */ } }, [settings]);
+  useEffect(() => { if (settings) try { localStorage.setItem('photostudio.export', JSON.stringify(settings)); } catch { /* ignore */ } }, [settings]);
 
   const items = useMemo(() => (scope === 'selected' ? photos.filter(p => selection.includes(p.id)) : photos).filter(p => p.thumbState !== 'error'), [scope, photos, selection]);
   if (!settings) return <div className="center"><div className="viewer-loading"><div className="spinner" /></div></div>;

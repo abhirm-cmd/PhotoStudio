@@ -24,7 +24,7 @@ export function TopBar() {
   const shortcuts = useApp(s => s.settings?.shortcuts) ?? DEFAULT_SHORTCUTS;
   return (
     <header className={`topbar ${platform === 'darwin' ? 'mac' : platform === 'win32' ? 'win' : ''}`}>
-      <div className="brand"><div className="brand-mark" />Lumora <span className="dim" style={{ fontWeight: 500 }}>Studio</span></div>
+      <div className="brand"><div className="brand-mark" />PhotoStudio <span className="dim brand-tagline" style={{ fontWeight: 500 }}>Alternative for Lightroom</span></div>
       <nav className="workspaces" aria-label="Workspaces">
         {TABS.map(t => (
           <button key={t.id} className={`ws-tab${ws === t.id ? ' active' : ''}`} onClick={() => goWorkspace(t.id)} title={`${t.label} (${shortcuts[`workspace.${t.id}`] ?? ''})`} aria-current={ws === t.id ? 'page' : undefined}>

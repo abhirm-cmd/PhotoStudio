@@ -81,7 +81,7 @@ const Cell = React.memo(function Cell({ photo: p, style, selected, active, onCli
       draggable onDragStart={e => {
         const lib = useLibrary.getState();
         const ids = lib.selection.includes(p.id) ? lib.selection : [p.id];
-        e.dataTransfer.setData('application/x-lumora-photos', JSON.stringify(ids));
+        e.dataTransfer.setData('application/x-photostudio-photos', JSON.stringify(ids));
         e.dataTransfer.effectAllowed = 'copy';
       }}
       role="gridcell" aria-selected={selected} aria-label={`${p.filename}, ${p.rating} stars${p.flag !== 'none' ? ', ' + p.flag : ''}`}>

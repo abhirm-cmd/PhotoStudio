@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer, webUtils } from 'electron';
 
-contextBridge.exposeInMainWorld('lumora', {
+contextBridge.exposeInMainWorld('photostudio', {
   call: (method: string, ...args: any[]) => ipcRenderer.invoke('api', method, ...args),
   on: (channel: string, cb: (...args: any[]) => void) => {
     const listener = (_e: unknown, ...args: any[]) => cb(...args);

@@ -217,7 +217,7 @@ export function defaultEdit(isRaw = true): EditParams {
   const wheel = (): GradeWheel => ({ hue: 0, sat: 0, lum: 0 });
   return {
     version: EDIT_VERSION,
-    profile: isRaw ? 'lumora-standard' : 'embedded',
+    profile: isRaw ? 'photostudio-standard' : 'embedded',
     wb: { mode: 'asShot', temp: DEFAULT_TEMP, tint: 0 },
     exposure: 0, contrast: 0, highlights: 0, shadows: 0, whites: 0, blacks: 0,
     vibrance: 0, saturation: 0,

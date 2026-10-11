@@ -1,5 +1,5 @@
 /**
- * GLSL ES 3.0 shaders for the Lumora render pipeline.
+ * GLSL ES 3.0 shaders for the PhotoStudio render pipeline.
  *
  * Pipeline (all intermediate textures are RGBA16F, scene-linear Rec.2020 until the
  * tone stage, display-referred linear Rec.2020 afterward):

@@ -39,7 +39,7 @@ export function App() {
         api.on('menu:action', (a: string) => runAction(a));
         await Promise.all([useLibrary.getState().refreshMeta(), useLibrary.getState().refresh()]);
         // End-to-end tests drive the real stores and services through this hook (test builds only).
-        if ((await api.appInfo()).isTest) (window as any).__lumora = await import('./services/testHooks').then(m => m.testHooks());
+        if ((await api.appInfo()).isTest) (window as any).__photostudio = await import('./services/testHooks').then(m => m.testHooks());
       } catch (e: any) {
         setFatal(String(e?.message ?? e));
       }
@@ -62,7 +62,7 @@ export function App() {
       if (!paths.length) return;
       // Reference-grade workspace takes dropped images as references instead of imports
       if (useApp.getState().workspace === 'reference' && paths.length === 1 && isSupported(paths[0])) {
-        window.dispatchEvent(new CustomEvent('lumora:reference-drop', { detail: paths[0] }));
+        window.dispatchEvent(new CustomEvent('photostudio:reference-drop', { detail: paths[0] }));
         return;
       }
       useApp.getState().openModal('import', { paths });
@@ -77,7 +77,7 @@ export function App() {
   if (fatal) {
     return (
       <div className="empty" style={{ height: '100%' }}>
-        <h3>Lumora Studio could not start</h3>
+        <h3>PhotoStudio could not start</h3>
         <p className="muted">{fatal}</p>
         <button className="btn" onClick={() => location.reload()}>Try again</button>
       </div>

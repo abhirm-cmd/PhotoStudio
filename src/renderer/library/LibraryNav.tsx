@@ -15,12 +15,12 @@ function NavItem({ icon, name, count, source, onContext }: { icon: React.ReactNo
   return (
     <div className={`nav-item${active ? ' active' : ''}`} onClick={() => setSource(source)} onContextMenu={onContext} role="button" tabIndex={0} aria-pressed={active}
       onKeyDown={e => { if (e.key === 'Enter') setSource(source); }}
-      onDragOver={e => { if (source.kind === 'collection' && e.dataTransfer.types.includes('application/x-lumora-photos')) { e.preventDefault(); (e.currentTarget as HTMLElement).classList.add('drop'); } }}
+      onDragOver={e => { if (source.kind === 'collection' && e.dataTransfer.types.includes('application/x-photostudio-photos')) { e.preventDefault(); (e.currentTarget as HTMLElement).classList.add('drop'); } }}
       onDragLeave={e => (e.currentTarget as HTMLElement).classList.remove('drop')}
       onDrop={async e => {
         (e.currentTarget as HTMLElement).classList.remove('drop');
         if (source.kind !== 'collection') return;
-        const ids = JSON.parse(e.dataTransfer.getData('application/x-lumora-photos') || '[]');
+        const ids = JSON.parse(e.dataTransfer.getData('application/x-photostudio-photos') || '[]');
         if (!ids.length) return;
         await api.addToCollection(source.id, ids);
         useLibrary.getState().refreshMeta();

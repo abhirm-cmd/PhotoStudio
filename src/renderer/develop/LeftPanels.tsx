@@ -51,11 +51,11 @@ export function usePresets(): Preset[] {
 export function PresetsSection() {
   const presets = usePresets();
   const [q, setQ] = useState('');
-  const [open, setOpen] = useState<Record<string, boolean>>(() => { try { return JSON.parse(localStorage.getItem('lumora.presetFolders') ?? '{}'); } catch { return {}; } });
+  const [open, setOpen] = useState<Record<string, boolean>>(() => { try { return JSON.parse(localStorage.getItem('photostudio.presetFolders') ?? '{}'); } catch { return {}; } });
   const [applied, setApplied] = useState<{ preset: Preset; base: EditParams; amount: number } | null>(null);
   const photoId = useDevelop(s => s.photoId);
   useEffect(() => setApplied(null), [photoId]);
-  const toggle = (f: string) => setOpen(o => { const n = { ...o, [f]: !(o[f] ?? false) }; try { localStorage.setItem('lumora.presetFolders', JSON.stringify(n)); } catch { /* ignore */ } return n; });
+  const toggle = (f: string) => setOpen(o => { const n = { ...o, [f]: !(o[f] ?? false) }; try { localStorage.setItem('photostudio.presetFolders', JSON.stringify(n)); } catch { /* ignore */ } return n; });
 
   const filtered = useMemo(() => {
     const s = q.trim().toLowerCase();

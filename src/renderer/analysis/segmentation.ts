@@ -477,8 +477,8 @@ function teethMask(img: Img, faces: NonNullable<Awaited<ReturnType<typeof faceLa
 }
 
 export const heuristicProvider: MaskProvider = {
-  id: 'lumora-heuristic',
-  label: 'Lumora on-device segmentation (heuristic)',
+  id: 'photostudio-heuristic',
+  label: 'PhotoStudio on-device segmentation (heuristic)',
   kind: 'heuristic',
   supports: () => true,
   async generate(img, target, opts) {

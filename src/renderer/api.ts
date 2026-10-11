@@ -1,4 +1,4 @@
-/** Typed bridge to the Electron main process (exposed by preload as window.lumora). */
+/** Typed bridge to the Electron main process (exposed by preload as window.photostudio). */
 import type { AppSettings, BackupInfo, CatalogStats, Collection, ExportPreset, ExportSettings, FolderNode, HistoryEntry, ImportOptions, IptcMeta, LensProfile, Photo, PhotoQuery, Preset, Snapshot, SmartRuleSet } from '@shared/types';
 import type { EditParams } from '@shared/edit';
 
@@ -9,9 +9,9 @@ interface Bridge {
   platform: string;
 }
 
-declare global { interface Window { lumora: Bridge } }
+declare global { interface Window { photostudio: Bridge } }
 
-const b = () => window.lumora;
+const b = () => window.photostudio;
 const call = <T = any>(m: string, ...a: any[]): Promise<T> => b().call(m, ...a);
 
 export const api = {

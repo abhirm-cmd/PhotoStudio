@@ -138,7 +138,7 @@ function SettingsModal({ tab: initial, onClose }: { tab?: SettingsTab; onClose()
           {tab === 'ai' && <>
             <div className="field-row"><label>AI features</label><Seg value={settings.ai.provider === 'off' ? 'off' : 'local'} onChange={v => update({ ai: { provider: v } })} options={[{ value: 'local', label: 'On this device' }, { value: 'off', label: 'Off' }]} /></div>
             <label className="check"><input type="checkbox" checked={settings.ai.analyzeOnImport} disabled={settings.ai.provider === 'off'} onChange={e => update({ ai: { analyzeOnImport: e.target.checked } })} />Analyse and tag new photos after import</label>
-            <div className="notice"><ShieldCheck size={14} /><div>All analysis (auto enhance, masks, scene tags, reference grading) runs locally. Lumora does not upload photos anywhere. If a cloud option is ever added, it will ask for your permission before any image leaves this computer.</div></div>
+            <div className="notice"><ShieldCheck size={14} /><div>All analysis (auto enhance, masks, scene tags, reference grading) runs locally. PhotoStudio does not upload photos anywhere. If a cloud option is ever added, it will ask for your permission before any image leaves this computer.</div></div>
           </>}
           {tab === 'color' && <>
             <div className="field-row"><label>Display</label><Seg value={settings.color.displayProfile} onChange={v => update({ color: { displayProfile: v } })} options={[{ value: 'srgb', label: 'sRGB' }, { value: 'display-p3', label: 'Display P3' }]} /></div>

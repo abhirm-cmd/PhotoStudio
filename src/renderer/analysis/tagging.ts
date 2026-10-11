@@ -76,7 +76,7 @@ export function colorStats(img: ImageData): ColorStats {
 }
 
 export const heuristicTagger: Tagger = {
-  id: 'lumora-heuristic', label: 'Lumora scene analysis (heuristic, on-device)', kind: 'heuristic',
+  id: 'photostudio-heuristic', label: 'PhotoStudio scene analysis (heuristic, on-device)', kind: 'heuristic',
   async tag(photo, img) {
     const s = colorStats(img);
     const t = new Set<string>();

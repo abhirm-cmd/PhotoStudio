@@ -55,8 +55,8 @@ function Welcome() {
   const [busy, setBusy] = useState(false);
   return (
     <div className="welcome">
-      <Empty kind="library" title="Welcome to Lumora Studio">
-        <p>Import a folder of photos to start. Lumora reads RAW files from Canon, Nikon, Sony, Fujifilm, Olympus, Panasonic, Pentax and DNG, plus JPEG, PNG, TIFF, WebP and HEIC. Your originals are never modified.</p>
+      <Empty kind="library" title="Welcome to PhotoStudio, the alternative for Lightroom">
+        <p>Import a folder of photos to start. PhotoStudio reads RAW files from Canon, Nikon, Sony, Fujifilm, Olympus, Panasonic, Pentax and DNG, plus JPEG, PNG, TIFF, WebP and HEIC. Your originals are never modified.</p>
         <div className="dropzone mt12">
           <div className="col" style={{ alignItems: 'center', gap: 12 }}>
             <div className="muted">Drag photos or folders here, or</div>

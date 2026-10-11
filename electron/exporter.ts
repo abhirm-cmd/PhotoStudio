@@ -38,7 +38,7 @@ import { targetSize } from '../src/shared/exportSize';
 const iccFiles = new Map<string, string>();
 function iccPath(id: string) {
   if (!iccFiles.has(id)) {
-    const p = path.join(os.tmpdir(), `lumora-${id}.icc`);
+    const p = path.join(os.tmpdir(), `photostudio-${id}.icc`);
     fs.writeFileSync(p, iccFor(id));
     iccFiles.set(id, p);
   }
@@ -53,7 +53,7 @@ function sharpenParams(s: ExportSettings['sharpen'], scale: number) {
 
 function exifFor(photo: Photo, s: ExportSettings): Record<string, any> | null {
   if (s.metadata === 'none') return null;
-  const ifd0: Record<string, string> = { Software: 'Lumora Studio' };
+  const ifd0: Record<string, string> = { Software: 'PhotoStudio' };
   if (photo.iptc.copyright) ifd0.Copyright = photo.iptc.copyright;
   if (photo.iptc.creator) ifd0.Artist = photo.iptc.creator;
   if (s.metadata === 'all') {
@@ -148,18 +148,18 @@ export function writeLinearDng(px: Uint16Array, w: number, h: number, photo: Pho
   add(258, SHORT, [16, 16, 16]);
   add(259, SHORT, [1]);
   add(262, SHORT, [34892]);
-  add(271, ASCII, ascii(photo.exif.make ?? 'Lumora'));
-  add(272, ASCII, ascii(photo.exif.model ?? 'Lumora Studio'));
+  add(271, ASCII, ascii(photo.exif.make ?? 'PhotoStudio'));
+  add(272, ASCII, ascii(photo.exif.model ?? 'PhotoStudio'));
   add(273, LONG, [0]); // StripOffsets — patched
   add(274, SHORT, [1]);
   add(277, SHORT, [3]);
   add(278, LONG, [h]);
   add(279, LONG, [w * h * 6]);
   add(284, SHORT, [1]);
-  add(305, ASCII, ascii('Lumora Studio'));
+  add(305, ASCII, ascii('PhotoStudio'));
   add(50706, BYTE, Buffer.from([1, 4, 0, 0]));
   add(50707, BYTE, Buffer.from([1, 1, 0, 0]));
-  add(50708, ASCII, ascii(`Lumora Linear ${[photo.exif.make, photo.exif.model].filter(Boolean).join(' ')}`.trim()));
+  add(50708, ASCII, ascii(`PhotoStudio Linear ${[photo.exif.make, photo.exif.model].filter(Boolean).join(' ')}`.trim()));
   add(50717, LONG, [65535]);
   add(50721, SRATIONAL, xyzToCam.flatMap(srat), 9);
   add(50727, RATIONAL, [1, 1, 1, 1, 1, 1], 3);

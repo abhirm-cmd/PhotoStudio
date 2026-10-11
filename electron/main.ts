@@ -14,13 +14,13 @@ import type { ExportSettings, ImportOptions, Photo, Preset } from '../src/shared
 import type { EditParams } from '../src/shared/edit';
 import { iccFor } from './icc';
 
-const isDev = !!process.env.LUMORA_DEV_URL;
-const isTest = !!process.env.LUMORA_TEST;
-if (process.env.LUMORA_USER_DATA) app.setPath('userData', process.env.LUMORA_USER_DATA);
-app.setName('Lumora Studio');
+const isDev = !!process.env.PHOTOSTUDIO_DEV_URL;
+const isTest = !!process.env.PHOTOSTUDIO_TEST;
+if (process.env.PHOTOSTUDIO_USER_DATA) app.setPath('userData', process.env.PHOTOSTUDIO_USER_DATA);
+app.setName('PhotoStudio');
 
 protocol.registerSchemesAsPrivileged([
-  { scheme: 'lumora', privileges: { standard: true, secure: true, supportFetchAPI: true, corsEnabled: true, stream: true, codeCache: true } },
+  { scheme: 'photostudio', privileges: { standard: true, secure: true, supportFetchAPI: true, corsEnabled: true, stream: true, codeCache: true } },
   { scheme: 'media', privileges: { standard: true, secure: true, supportFetchAPI: true, corsEnabled: true, stream: true } },
 ]);
 
@@ -40,7 +40,7 @@ const MEDIA_HEADERS = { 'Cross-Origin-Resource-Policy': 'cross-origin', 'Access-
 
 function openCatalog() {
   const dir = settings.data.catalog.location;
-  catalog = new Catalog(path.join(dir, 'Lumora Catalog.lcat'));
+  catalog = new Catalog(path.join(dir, 'PhotoStudio Catalog.lcat'));
   previews = new PreviewCache(path.join(dir, 'Previews'));
   if (!catalog.hasBuiltinPresets()) seedBuiltinPresets(catalog);
   importer = new Importer(catalog, previews, () => (win && !win.isDestroyed() ? requestRawThumb : null));
@@ -68,7 +68,7 @@ function requestRawThumb(id: number, file: string): Promise<RawThumbResult> {
 
 function registerProtocols() {
   const distDir = path.join(__dirname, '..', 'dist');
-  protocol.handle('lumora', async req => {
+  protocol.handle('photostudio', async req => {
     const url = new URL(req.url);
     let rel = decodeURIComponent(url.pathname);
     if (rel === '/' || !path.extname(rel)) rel = '/index.html';
@@ -164,7 +164,7 @@ const api: Record<string, Handler> = {
   'photos:storeRendered': async (id: number, jpeg: Uint8Array) => { await previews.storeRendered(id, Buffer.from(jpeg)); send('photo:thumb', id); },
   'photos:reportIssue': async (id: number) => {
     const p = catalog.getPhoto(id);
-    const report = [`Lumora Studio ${app.getVersion()} (${process.platform} ${process.arch})`, `File: ${p?.path}`, `Format: ${p?.ext}`, `Size: ${p?.fileSize} bytes`, `Camera: ${p?.exif.make ?? ''} ${p?.exif.model ?? ''}`, `Error: ${p?.error}`, `Date: ${new Date().toISOString()}`].join('\n');
+    const report = [`PhotoStudio ${app.getVersion()} (${process.platform} ${process.arch})`, `File: ${p?.path}`, `Format: ${p?.ext}`, `Size: ${p?.fileSize} bytes`, `Camera: ${p?.exif.make ?? ''} ${p?.exif.model ?? ''}`, `Error: ${p?.error}`, `Date: ${new Date().toISOString()}`].join('\n');
     const dir = path.join(app.getPath('userData'), 'Reports');
     fs.mkdirSync(dir, { recursive: true });
     const f = path.join(dir, `issue-${id}-${Date.now()}.txt`);
@@ -194,13 +194,13 @@ const api: Record<string, Handler> = {
   'presets:save': (p: Preset) => catalog.savePreset(p),
   'presets:delete': (id: string) => catalog.deletePreset(id),
   'presets:export': async (presets: Preset[]) => {
-    const r = await dialog.showSaveDialog(win!, { title: 'Export presets', defaultPath: presets.length === 1 ? `${presets[0].name}.lumora-preset.json` : 'Lumora Presets.lumora-preset.json', filters: [{ name: 'Lumora preset', extensions: ['json'] }] });
+    const r = await dialog.showSaveDialog(win!, { title: 'Export presets', defaultPath: presets.length === 1 ? `${presets[0].name}.photostudio-preset.json` : 'PhotoStudio Presets.photostudio-preset.json', filters: [{ name: 'PhotoStudio preset', extensions: ['json'] }] });
     if (r.canceled || !r.filePath) return null;
-    fs.writeFileSync(r.filePath, JSON.stringify({ format: 'lumora-preset', version: 1, presets }, null, 2));
+    fs.writeFileSync(r.filePath, JSON.stringify({ format: 'photostudio-preset', version: 1, presets }, null, 2));
     return r.filePath;
   },
   'presets:import': async () => {
-    const r = await dialog.showOpenDialog(win!, { title: 'Import presets', properties: ['openFile', 'multiSelections'], filters: [{ name: 'Lumora preset', extensions: ['json'] }] });
+    const r = await dialog.showOpenDialog(win!, { title: 'Import presets', properties: ['openFile', 'multiSelections'], filters: [{ name: 'PhotoStudio preset', extensions: ['json'] }] });
     if (r.canceled) return [];
     const out: any[] = [];
     for (const f of r.filePaths) {
@@ -248,7 +248,7 @@ const api: Record<string, Handler> = {
   'shell:reveal': (p: string) => shell.showItemInFolder(p),
   'shell:open': (p: string) => shell.openPath(p),
 
-  'export:defaultDir': () => path.join(app.getPath('pictures'), 'Lumora Exports'),
+  'export:defaultDir': () => path.join(app.getPath('pictures'), 'PhotoStudio Exports'),
   'export:write': async (photoId: number, pixels: Uint8Array | Uint16Array, width: number, height: number, s: ExportSettings, seq: number) => {
     const photo = catalog.getPhoto(photoId);
     if (!photo) throw new Error('Photo not found');
@@ -279,7 +279,7 @@ function createWindow() {
   win = new BrowserWindow({
     width: 1600, height: 1000, minWidth: 1280, minHeight: 720,
     backgroundColor: '#0e0f11',
-    title: 'Lumora Studio',
+    title: 'PhotoStudio · Alternative for Lightroom',
     show: false,
     titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : 'hidden',
     titleBarOverlay: process.platform === 'darwin' ? undefined : { color: '#121316', symbolColor: '#c9ccd3', height: 40 },
@@ -293,10 +293,10 @@ function createWindow() {
       backgroundThrottling: false,
     },
   });
-  win.once('ready-to-show', () => { if (!process.env.LUMORA_HIDDEN) win?.show(); });
+  win.once('ready-to-show', () => { if (!process.env.PHOTOSTUDIO_HIDDEN) win?.show(); });
   win.webContents.setWindowOpenHandler(({ url }) => { shell.openExternal(url); return { action: 'deny' }; });
-  if (isDev) win.loadURL(process.env.LUMORA_DEV_URL!);
-  else win.loadURL('lumora://app/index.html');
+  if (isDev) win.loadURL(process.env.PHOTOSTUDIO_DEV_URL!);
+  else win.loadURL('photostudio://app/index.html');
   win.on('closed', () => { win = null; });
 }
 

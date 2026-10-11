@@ -4,7 +4,7 @@
  * 1. Both images are rendered through the real pipeline and measured in
  *    perceptual space: tonal quantiles, contrast, black/white points, colour
  *    cast per tonal zone, saturation and per-hue colour statistics, palette.
- * 2. A normal, editable Lumora edit is fitted to the target photo with a
+ * 2. A normal, editable PhotoStudio edit is fitted to the target photo with a
  *    closed loop: apply → re-render → re-measure → correct. Tone is matched
  *    with exposure and a quantile-matched tone curve, colour with 3-way grading
  *    wheels, saturation/vibrance and the HSL mixer.

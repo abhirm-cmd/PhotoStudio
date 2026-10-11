@@ -1,4 +1,4 @@
-/** Handles used by tests/e2e to drive the real app (only installed when LUMORA_TEST is set). */
+/** Handles used by tests/e2e to drive the real app (only installed when PHOTOSTUDIO_TEST is set). */
 import { useApp } from '../store/app';
 import { useLibrary } from '../store/library';
 import { useDevelop } from '../store/develop';

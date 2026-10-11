@@ -3,7 +3,7 @@ import path from 'node:path';
 import type { Catalog } from './catalog';
 import type { BackupInfo } from '../src/shared/types';
 
-const PREFIX = 'lumora-catalog-';
+const PREFIX = 'photostudio-catalog-';
 
 export function listBackups(dir: string): BackupInfo[] {
   if (!fs.existsSync(dir)) return [];

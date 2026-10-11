@@ -1,10 +1,10 @@
 {
-  "name": "lumora-studio",
-  "productName": "Lumora Studio",
+  "name": "photostudio",
+  "productName": "PhotoStudio",
   "version": "0.1.0",
-  "description": "Professional RAW photo management and non-destructive editing suite",
+  "description": "PhotoStudio: Alternative for Lightroom. RAW photo management and non-destructive editing",
   "main": "dist-electron/main.cjs",
-  "author": "Lumora Studio",
+  "author": "PhotoStudio",
   "license": "UNLICENSED",
   "private": true,
   "type": "module",
@@ -43,5 +43,34 @@
     "typescript": "^7.0.2",
     "vite": "^8.3.3",
     "vitest": "^5.0.3"
+  },
+  "build": {
+    "appId": "com.photostudio.app",
+    "productName": "PhotoStudio",
+    "files": [
+      "dist/**",
+      "dist-electron/**",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "resources",
+        "to": "resources"
+      }
+    ],
+    "mac": {
+      "category": "public.app-category.photography"
+    },
+    "linux": {
+      "category": "Graphics",
+      "target": [
+        "AppImage"
+      ]
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ]
+    }
   }
 }

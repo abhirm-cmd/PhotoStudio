@@ -1,4 +1,4 @@
-/* Lumora Studio — workspace, tool and dialog styles (layered on app.css tokens). */
+/* PhotoStudio — workspace, tool and dialog styles (layered on app.css tokens). */
 
 /* ----------------------------------------------------------------- utilities */
 .text-0 { color: var(--text-0); }
@@ -276,3 +276,4 @@ input[type='range'].range { accent-color: var(--accent); width: 110px; }
 /* toolbar sizing: selects keep their natural width, search takes the slack */
 .lib-toolbar select.input, .filter-bar select.input { width: auto; flex: 0 0 auto; }
 .lib-toolbar > .search { flex: 1; min-width: 220px; max-width: 520px; }
+.brand-tagline { font-size: 11px; margin-left: 2px; }

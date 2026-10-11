@@ -13,7 +13,7 @@ const url = server.resolvedUrls.local[0];
 let child = null;
 const restart = () => {
   if (child) { child.removeAllListeners('exit'); child.kill(); }
-  child = spawn(electronPath, ['.'], { cwd: root, stdio: 'inherit', env: { ...process.env, LUMORA_DEV_URL: `${url}index.html` } });
+  child = spawn(electronPath, ['.'], { cwd: root, stdio: 'inherit', env: { ...process.env, PHOTOSTUDIO_DEV_URL: `${url}index.html` } });
   child.on('exit', code => { server.close(); process.exit(code ?? 0); });
 };
 const ctx = await context({
@@ -22,4 +22,4 @@ const ctx = await context({
   plugins: [{ name: 'restart', setup: b => b.onEnd(r => { if (!r.errors.length) restart(); }) }],
 });
 await ctx.watch();
-console.log(`Lumora Studio dev: renderer at ${url}`);
+console.log(`PhotoStudio dev: renderer at ${url}`);

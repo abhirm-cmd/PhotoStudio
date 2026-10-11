@@ -130,11 +130,11 @@ export function Slider({ label, value, min, max, step = 1, defaultValue = 0, onC
 
 /* ----------------------------------------------------------------- Section */
 
-const sectionState: Record<string, boolean> = (() => { try { return JSON.parse(localStorage.getItem('lumora.sections') ?? '{}'); } catch { return {}; } })();
+const sectionState: Record<string, boolean> = (() => { try { return JSON.parse(localStorage.getItem('photostudio.sections') ?? '{}'); } catch { return {}; } })();
 
 export function Section({ id, title, children, defaultOpen = true, actions, badge, onReset, resetDisabled }: { id: string; title: ReactNode; children: ReactNode; defaultOpen?: boolean; actions?: ReactNode; badge?: ReactNode; onReset?: () => void; resetDisabled?: boolean }) {
   const [open, setOpen] = useState(sectionState[id] ?? defaultOpen);
-  const toggle = () => { const v = !open; setOpen(v); sectionState[id] = v; try { localStorage.setItem('lumora.sections', JSON.stringify(sectionState)); } catch { /* ignore */ } };
+  const toggle = () => { const v = !open; setOpen(v); sectionState[id] = v; try { localStorage.setItem('photostudio.sections', JSON.stringify(sectionState)); } catch { /* ignore */ } };
   return (
     <section className={`section${open ? '' : ' closed'}`} aria-label={typeof title === 'string' ? title : id}>
       <div className="section-head" onClick={toggle} role="button" aria-expanded={open} tabIndex={0} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } }}>
@@ -320,7 +320,7 @@ export function useDebounced<T>(value: T, ms: number): T {
 
 export function Kbd({ combo }: { combo?: string }) {
   if (!combo) return null;
-  const mac = (window as any).lumora?.platform === 'darwin';
+  const mac = (window as any).photostudio?.platform === 'darwin';
   return <span className="kbd">{combo.replace('Mod', mac ? '⌘' : 'Ctrl').replace('Shift', mac ? '⇧' : 'Shift').replace('Alt', mac ? '⌥' : 'Alt').replace(/\+/g, mac ? '' : '+')}</span>;
 }
 
