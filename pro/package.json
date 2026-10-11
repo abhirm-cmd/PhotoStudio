@@ -1,0 +1,52 @@
+{
+  "name": "photostudio-pro",
+  "productName": "PhotoStudio Pro",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "dist-electron/main.cjs",
+  "dependencies": {
+    "ffmpeg-static": "^5.3.0",
+    "@ffprobe-installer/ffprobe": "^2.1.2"
+  },
+  "description": "PhotoStudio Pro: video editor with multi-track timeline, color grading, audio mixing and FFmpeg export",
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "build:main": "node scripts/build-main.mjs",
+    "build:renderer": "vite build",
+    "build": "npm run build:main && npm run build:renderer",
+    "start": "electron .",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run",
+    "test:e2e": "node tests/e2e/run.mjs",
+    "media": "node scripts/gen-media.mjs",
+    "dist": "npm run build && electron-builder"
+  },
+  "build": {
+    "appId": "com.photostudio.pro",
+    "productName": "PhotoStudio Pro",
+    "files": [
+      "dist/**",
+      "dist-electron/**",
+      "package.json"
+    ],
+    "asarUnpack": [
+      "node_modules/ffmpeg-static/**",
+      "node_modules/@ffprobe-installer/**"
+    ],
+    "mac": {
+      "category": "public.app-category.video"
+    },
+    "linux": {
+      "category": "AudioVideo",
+      "target": [
+        "AppImage"
+      ]
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ]
+    }
+  }
+}

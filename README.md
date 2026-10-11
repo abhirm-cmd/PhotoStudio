@@ -20,6 +20,10 @@ A desktop RAW photo manager and non-destructive editor (Electron + React + TypeS
 | Export | Tiled full-resolution GPU render to JPEG, PNG, TIFF (8/16-bit) and linear DNG, resize modes, sRGB / Display P3 / Adobe RGB / ProPhoto with embedded ICC, output sharpening, metadata control, filename templates, watermark, export presets. |
 | Safety | Automatic catalog backups and restore, originals checked by hash in the end-to-end test, nothing is deleted without confirmation. |
 
+## PhotoStudio Pro (video)
+
+The [`pro/`](pro/) folder holds **PhotoStudio Pro**, a video editor with a multi-track timeline, color page, audio mixer and FFmpeg rendering. See [pro/README.md](pro/README.md).
+
 ## Development
 
     npm install
