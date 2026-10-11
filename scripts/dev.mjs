@@ -6,6 +6,7 @@ import path from 'node:path';
 import electronPath from 'electron';
 
 const root = path.resolve(import.meta.dirname, '..');
+await import('./copy-ort.mjs');
 const server = await createServer({ configFile: path.join(root, 'vite.config.ts') });
 await server.listen();
 const url = server.resolvedUrls.local[0];

@@ -124,6 +124,28 @@ try {
   await page.waitForTimeout(800);
   await shot('07-mask-sky-applied');
 
+  /* ------------------------------------------------------------ AI subject mask (on-device neural model) */
+  const portrait = photos.find(p => p.filename === 'portrait-study.jpg');
+  await L(id => { window.__photostudio.useView.setState({ ready: false }); window.__photostudio.useLibrary.getState().setActive(id); }, portrait.id);
+  await until(id => window.__photostudio.host().photo?.id === id && window.__photostudio.useView.getState().ready && window.__photostudio.useDevelop.getState().photoId === id, portrait.id, 60_000, 'portrait');
+  const tSubject = Date.now();
+  await L(() => window.__photostudio.createMask('subject'));
+  await until(() => window.__photostudio.useDevelop.getState().edit.masks.length > 0 && !document.querySelector('.mask-create .spinner'), null, 120_000, 'subject mask');
+  const subj = await L(() => {
+    const c = window.__photostudio.useDevelop.getState().edit.masks[0]?.components?.[0];
+    const a = c && window.__photostudio.host().assets.get(c.ref);
+    if (!a) return { c };
+    const at = (u, v) => a.data[Math.min(a.height - 1, Math.floor(v * a.height)) * a.width + Math.min(a.width - 1, Math.floor(u * a.width))];
+    let cov = 0; for (const v of a.data) if (v > 127) cov++;
+    return { c, face: at(0.5, 0.45), corner: Math.max(at(0.05, 0.05), at(0.95, 0.05), at(0.05, 0.6), at(0.95, 0.6)), cov: cov / a.data.length };
+  });
+  check('Select Subject runs the on-device neural model', subj.c?.type === 'ai' && /neural/i.test(subj.c?.provider ?? ''), `${subj.c?.provider} in ${((Date.now() - tSubject) / 1000).toFixed(1)}s`);
+  check('Subject mask covers the person, not the backdrop', subj.face > 200 && subj.corner < 40, `face ${subj.face}, backdrop ${subj.corner}, coverage ${(subj.cov * 100).toFixed(1)}%`);
+  await L(() => window.__photostudio.useDevelop.getState().set({ maskOverlay: true }));
+  await page.waitForTimeout(1200);
+  await shot('07b-mask-subject-overlay');
+  await L(() => window.__photostudio.useDevelop.getState().set({ maskOverlay: false }));
+
   /* ------------------------------------------------------------ reference grade */
   const forest = photos.find(p => p.filename === 'forest-trail.jpg');
   await L(() => window.__photostudio.useApp.getState().setWorkspace('reference'));

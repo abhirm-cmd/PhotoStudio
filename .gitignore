@@ -8,3 +8,4 @@ release/
 tests/fixtures/*
 !tests/fixtures/README.md
 tests/output/
+public/vendor/ort/

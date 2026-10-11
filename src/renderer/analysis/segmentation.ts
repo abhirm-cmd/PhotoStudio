@@ -372,7 +372,7 @@ function objectMask(img: Img, box: [number, number, number, number]): Float32Arr
   return guidedFilter(img.L, refined, w, h, 2, 1e-3);
 }
 
-function skinLikelihood(img: Img): Float32Array {
+export function skinLikelihood(img: Img): Float32Array {
   const { L, A, B } = img;
   const out = new Float32Array(L.length);
   for (let i = 0; i < L.length; i++) {

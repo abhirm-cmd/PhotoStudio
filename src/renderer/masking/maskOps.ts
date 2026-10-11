@@ -4,6 +4,7 @@ import { useApp } from '../store/app';
 import { defaultLocal, uid, type Mask, type MaskComponent, type MaskOp, type AiMaskTarget, type Vec2 } from '@shared/edit';
 import { MAX_MASKS } from '../engine/params';
 import { generateMask, NoResultError } from '../analysis/segmentation';
+import '../analysis/neural';
 import { host } from '../engine/host';
 import { computeGeometry, outToSrc, orientationMatrix } from '../engine/geometry';
 
