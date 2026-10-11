@@ -3,7 +3,7 @@
  * the preview player and the FFmpeg export. Operations mutate the project they
  * receive; callers clone first (the store keeps immutable history snapshots).
  */
-import { type Project, type Clip, type Track, newClip, uid, clipEnd, mediaOf, clipsOnTrack, trackAudible } from './project';
+import { type Project, type Clip, type Track, type MotionRect, newClip, uid, clipEnd, mediaOf, clipsOnTrack, trackAudible } from './project';
 
 /* ------------------------------------------------------------- helpers */
 
@@ -93,6 +93,12 @@ export function splitClip(p: Project, id: string, frame: number, linked = true):
     right.start = frame; right.duration = t.duration - cut;
     right.srcIn = t.srcIn + (cut / p.settings.fps) * t.speed;
     right.transitionIn = null; right.fadeIn = 0;
+    if (t.motion) {
+      // Each half keeps its part of the move
+      const left = motionAt(t, clipProgress(t, frame - 1)), mid = motionAt(t, clipProgress(t, frame));
+      right.motion = { from: mid!, to: t.motion.to };
+      t.motion = { from: t.motion.from, to: left! };
+    }
     t.duration = cut; t.fadeOut = 0;
     p.clips.push(right);
     if (t.id === id) rightId = right.id;
@@ -340,8 +346,23 @@ export interface Placement {
   crop: [number, number, number, number];
 }
 
-/** Where a clip's picture lands in the frame (same math for preview and export). */
-export function placement(p: Project, c: Clip, srcW: number, srcH: number): Placement {
+/** Progress (0..1) through a clip at a timeline frame, for animated moves. */
+export const clipProgress = (c: Clip, frame: number) => (c.duration <= 1 ? 0 : Math.min(1, Math.max(0, (frame - c.start) / (c.duration - 1))));
+
+/** The motion window at a progress (fractions of the user-cropped source). */
+export function motionAt(c: Clip, u: number): MotionRect | null {
+  const m = c.motion;
+  if (!m) return null;
+  const l = (a: number, b: number) => a + (b - a) * u;
+  return { x: l(m.from.x, m.to.x), y: l(m.from.y, m.to.y), w: l(m.from.w, m.to.w), h: l(m.from.h, m.to.h) };
+}
+
+/**
+ * Where a clip's picture lands in the frame (same math for preview and export).
+ * `frame` evaluates an animated zoom/pan; the move only changes the crop, so
+ * the picture keeps its size and position.
+ */
+export function placement(p: Project, c: Clip, srcW: number, srcH: number, frame?: number): Placement {
   const { width: W, height: H } = p.settings;
   const t = c.transform;
   const fit = Math.min(W / srcW, H / srcH);
@@ -350,5 +371,12 @@ export function placement(p: Project, c: Clip, srcW: number, srcH: number): Plac
   // Cropping keeps the remaining area where it was in the uncropped frame
   const shiftX = ((t.cropL - t.cropR) / 2) * srcW * fit * t.scale;
   const shiftY = ((t.cropT - t.cropB) / 2) * srcH * fit * t.scale;
-  return { w, h, cx: W / 2 + t.x + shiftX, cy: H / 2 + t.y + shiftY, rotation: t.rotation, crop: [t.cropL, t.cropT, t.cropR, t.cropB] };
+  let crop: [number, number, number, number] = [t.cropL, t.cropT, t.cropR, t.cropB];
+  const win = frame == null ? null : motionAt(c, clipProgress(c, frame));
+  if (win) {
+    const uw = 1 - t.cropL - t.cropR, uh = 1 - t.cropT - t.cropB;
+    const L = t.cropL + win.x * uw, T = t.cropT + win.y * uh;
+    crop = [L, T, 1 - L - win.w * uw, 1 - T - win.h * uh];
+  }
+  return { w, h, cx: W / 2 + t.x + shiftX, cy: H / 2 + t.y + shiftY, rotation: t.rotation, crop };
 }

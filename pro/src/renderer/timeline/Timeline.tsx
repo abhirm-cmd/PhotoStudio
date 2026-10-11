@@ -3,7 +3,7 @@
  * waveforms, move/trim/razor/marquee, snapping, markers and media drops.
  */
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, memo } from 'react';
-import { MousePointer2, Scissors, Magnet, Plus, Type, Square, Lock, Unlock, Eye, EyeOff, Volume2, VolumeX, ZoomIn, ZoomOut, Maximize2, Link2, ArrowLeftRight } from 'lucide-react';
+import { MousePointer2, Scissors, Magnet, Plus, Type, Square, Lock, Unlock, Eye, EyeOff, Volume2, VolumeX, ZoomIn, ZoomOut, Maximize2, Link2, ArrowLeftRight, Wand2 } from 'lucide-react';
 import { type Project, type Clip, type Track, type MediaItem, clipEnd, timecode, projectDuration, newTrack } from '@shared/project';
 import { moveClips, trimClip, splitClip, splitAt, snapFrame, clipsForMedia, placeClips, closeGap, withLinked } from '@shared/timeline';
 import { isNeutral } from '@shared/grade';
@@ -12,6 +12,7 @@ import { usePlayer } from '../store/player';
 import { cacheUrl } from '../api';
 import { openMenu, promptText } from '../components/ui';
 import * as A from '../services/actions';
+import { MatchEditDialog, useMatchEdit } from '../components/MatchEdit';
 
 export const MEDIA_DND = 'application/x-psp-media';
 const HEAD_W = 168;
@@ -514,6 +515,8 @@ export function Timeline() {
         <button className="btn sm ghost" onClick={() => A.addTitle()} title="Add a title at the playhead"><Type size={13} />Title</button>
         <button className="btn sm ghost" onClick={() => A.addColor()} title="Add a color matte at the playhead"><Square size={13} />Matte</button>
         <button className="btn sm ghost" onClick={() => useProject.getState().edit('Add tracks', q => { const nv = q.tracks.filter(t => t.kind === 'video').length + 1; const na = q.tracks.filter(t => t.kind === 'audio').length + 1; const vi = q.tracks.map(t => t.kind).lastIndexOf('video'); q.tracks.splice(vi + 1, 0, newTrack('video', nv)); q.tracks.push(newTrack('audio', na)); })} title="Add a video and an audio track"><Plus size={13} />Tracks</button>
+        <button className="btn sm ghost" onClick={() => useMatchEdit.getState().setOpen(true)} title="Copy the cuts, transitions and moves of an edited video onto new footage" data-testid="match-open"><Wand2 size={13} />Match Edit</button>
+        <MatchEditDialog />
         <span className="grow" />
         <span className="tl-hint">{tl.tool === 'razor' ? 'Click a clip to cut it' : 'Drag media here · Ctrl/⌘ while dropping inserts'}</span>
         <button className="icon-btn" onClick={() => zoomBy(1 / 1.5)} title="Zoom out (-)"><ZoomOut size={14} /></button>

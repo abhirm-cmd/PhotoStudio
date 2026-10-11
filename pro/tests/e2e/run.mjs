@@ -78,6 +78,14 @@ const fileRgb = (f, t) => {
   return s.map(v => v / (b.length / 3));
 };
 const diff = (a, b) => Math.max(...a.map((v, i) => Math.abs(v - b[i])));
+const byName2 = (p, n) => p.media.find(m => m.name === n);
+/** Mean RGB of the centre quarter of one exported frame (same region as programRgb([0.25, 0.25, 0.5, 0.5])). */
+const fileRgbRegion = (f, t) => {
+  const b = execFileSync(ffmpegPath(), ['-v', 'error', '-ss', String(t), '-i', f, '-frames:v', '1', '-vf', 'crop=iw/2:ih/2:iw/4:ih/4,scale=64:36:flags=area,format=rgb24', '-f', 'rawvideo', 'pipe:1']);
+  const s = [0, 0, 0];
+  for (let i = 0; i < b.length; i += 3) { s[0] += b[i]; s[1] += b[i + 1]; s[2] += b[i + 2]; }
+  return s.map(v => v / (b.length / 3));
+};
 const lum = c => 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
 
 try {
@@ -87,7 +95,8 @@ try {
 
   /* ------------------------------------------------------------ import */
   const t0 = Date.now();
-  await L(paths => window.__psp.importPaths(paths), [media]);
+  const BASE = ['city-1080p30.mp4', 'bars-720p25.mp4', 'vertical-720x1280.mp4', 'still-gradient.png', 'music-bed.mp3'];
+  await L(paths => window.__psp.importPaths(paths), BASE.map(f => path.join(media, f)));
   await until(() => {
     const s = window.__psp; const p = s.useProject.getState().project;
     return p.media.length >= 5 && p.media.every(m => (m.kind === 'audio' || m.thumbs) && (!m.hasAudio || m.waveform)) && !Object.keys(s.useUI.getState().tasks).length;
@@ -251,6 +260,57 @@ try {
     }
   }
 
+  /* ------------------------------------------------------------ Match Edit */
+  await L(() => window.__psp.useUI.getState().setPage('edit'));
+  await L(f => window.__psp.importPaths([f]), path.join(media, 'reference-edit.mp4'));
+  await until(() => window.__psp.useProject.getState().project.media.some(m => m.name === 'reference-edit.mp4'), null, 30_000, 'reference import');
+  await page.click('[data-testid="match-open"]');
+  p = await P();
+  await page.selectOption('[data-testid="match-reference"]', byName2(p, 'reference-edit.mp4').id);
+  const tAn = Date.now();
+  await until(() => !!document.querySelector('[data-testid="match-summary"]'), null, 60_000, 'reference analysis');
+  const summary = await L(() => document.querySelector('[data-testid="match-summary"]').textContent);
+  check('Match Edit analyses the reference', /^5 shots/.test(summary) && /1 dissolve/.test(summary) && /1 dip/.test(summary) && /2 zoom\/pan moves/.test(summary) && /fade in/.test(summary) && /fade out/.test(summary), `${summary} in ${((Date.now() - tAn) / 1000).toFixed(1)} s`);
+  for (const name of ['city-1080p30.mp4', 'vertical-720x1280.mp4', 'bars-720p25.mp4']) await page.click(`[data-testid="match-footage"] label:has-text("${name}")`);
+  await shot('11-match-edit-dialog');
+  await page.click('[data-testid="match-build"]');
+  await page.waitForSelector('.modal-backdrop:nth-of-type(2) .btn.primary, .modal-backdrop + .modal-backdrop .btn.primary', { timeout: 5000 }).catch(() => {});
+  // confirm replacing the timeline
+  await L(() => { const bs = [...document.querySelectorAll('.modal .btn.primary')]; bs[bs.length - 1].click(); });
+  await until(() => !document.querySelector('[data-testid="match-build"]'), null, 60_000, 'match build');
+  p = await P();
+  const ref = await L(path => window.__psp.api.analyzeReference('e2e', path), byName2(p, 'reference-edit.mp4').path);
+  const v1 = p.tracks.find(t => t.kind === 'video').id;
+  const vClips = p.clips.filter(c => c.trackId === v1).sort((a, b) => a.start - b.start);
+  const want = ref.shots.map(s => Math.round(s.start * p.settings.fps));
+  check('Matched edit has the reference cuts', JSON.stringify(vClips.map(c => c.start)) === JSON.stringify(want), `clips at ${vClips.map(c => c.start).join(', ')} · reference ${want.join(', ')}`);
+  check('Matched edit copies transitions and moves', vClips[3]?.transitionIn?.type === 'dissolve' && vClips[4]?.transitionIn?.type === 'dip' && !!vClips[1]?.motion && !!vClips[3]?.motion && vClips[0].fadeIn > 0 && vClips[4].fadeOut > 0,
+    vClips.map(c => `${c.name}${c.transitionIn ? ` +${c.transitionIn.type}` : ''}${c.motion ? ' +move' : ''}`).join(' | '));
+  const aClips = p.clips.filter(c => p.tracks.find(t => t.id === c.trackId)?.kind === 'audio');
+  check('Matched edit uses the reference soundtrack and look', aClips.length === 1 && aClips[0].mediaId === byName2(p, 'reference-edit.mp4').id && vClips.every(c => JSON.stringify(c.grade) === JSON.stringify(vClips[0].grade)) && vClips[0].grade.exposure !== undefined,
+    `audio: ${aClips.map(c => c.name).join(', ')} · grade exposure ${vClips[0].grade.exposure}, contrast ${vClips[0].grade.contrast}, sat ${vClips[0].grade.saturation}, temp ${vClips[0].grade.temperature}`);
+  await setFrame(Math.round(vClips[1].start + 5));
+  await shot('12-match-edit-timeline');
+  // Render it and check the cuts in the rendered file
+  await L(() => window.__psp.useUI.getState().setPage('deliver'));
+  await page.fill('[data-testid="export-name"]', 'e2e-match');
+  await page.fill('[data-testid="export-dir"]', out);
+  await page.click('[data-testid="render"]');
+  await until(() => [...document.querySelectorAll('[data-testid="job"]')].some(j => j.textContent.includes('e2e-match') && (j.classList.contains('done') || j.classList.contains('failed'))), null, 300_000, 'match export');
+  const matchFile = path.join(out, 'e2e-match.mp4');
+  if (fs.existsSync(matchFile)) {
+    const again = await L(path => window.__psp.api.analyzeReference('e2e2', path), matchFile);
+    const got = again.shots.map(s => Math.round(s.start * 30));
+    check('Rendered matched edit cuts where the reference cuts', JSON.stringify(got) === JSON.stringify(want), `render ${got.join(', ')}`);
+    // the zoom move looks the same in the preview and the render, at its start and end
+    for (const f of [vClips[1].start + 3, vClips[1].start + vClips[1].duration - 3]) {
+      await setFrame(f);
+      const pv = await programRgb([0.25, 0.25, 0.5, 0.5]);
+      const ex = fileRgbRegion(matchFile, (f + 0.5) / 30);
+      check(`Zoom move matches the render at frame ${f}`, diff(pv, ex) < 14, `preview ${pv.map(v => v.toFixed(0))} export ${ex.map(v => v.toFixed(0))}`);
+    }
+  } else check('Rendered matched edit cuts where the reference cuts', false, 'no output file');
+
   /* --------------------------------------------------------- originals untouched */
   const changed = sources.filter(f => sha(f) !== hashes.get(f));
   check('Source media files are never modified', !changed.length, changed.join(', '));
@@ -264,7 +324,10 @@ try {
   await shot('error').catch(() => {});
 } finally {
   fs.writeFileSync(path.join(out, 'results.json'), JSON.stringify(results, null, 2));
-  await app.close().catch(() => {});
+  // The matched edit leaves unsaved changes; don't let the save prompt hold the window open
+  await L(() => window.__psp.useProject.getState().markSaved(window.__psp.useProject.getState().file ?? null)).catch(() => {});
+  await Promise.race([app.close().catch(() => {}), new Promise(r => setTimeout(r, 10_000))]);
+  appProc.kill('SIGKILL');
   console.log(`\n${results.length - failed}/${results.length} checks passed`);
   process.exit(failed ? 1 : 0);
 }

@@ -6,6 +6,7 @@ import { spawn, type ChildProcess } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { probe, makeThumbs, makeWaveform, makeProxy, grabFrame, FFMPEG, MEDIA_EXT } from './media';
 import { buildExport, type ExportOptions } from '../src/shared/ffgraph';
+import { analyzeReference, sampleColors } from './reference';
 import { normalizeProject, type Project, type MediaItem } from '../src/shared/project';
 
 const isDev = !!process.env.PHOTOSTUDIO_PRO_DEV_URL;
@@ -177,6 +178,7 @@ function loadProject(file: string) {
 /* ---------------------------------------------------------------- IPC */
 
 type Handler = (...args: any[]) => any;
+const matchJobs = new Map<string, { cancelled: boolean }>();
 const api: Record<string, Handler> = {
   'app:info': () => ({ version: app.getVersion(), platform: process.platform, isTest, ffmpeg: FFMPEG, userData: app.getPath('userData') }),
   'media:pick': async (kind: 'files' | 'folder') => {
@@ -198,6 +200,13 @@ const api: Record<string, Handler> = {
     return { ...(await probe(r.filePaths[0])) };
   },
   'media:reveal': (p: string) => shell.showItemInFolder(p),
+  'match:analyze': (jobId: string, file: string) => {
+    const signal = { cancelled: false };
+    matchJobs.set(jobId, signal);
+    return analyzeReference(file, f => send('match:progress', { jobId, progress: f }), signal).finally(() => matchJobs.delete(jobId));
+  },
+  'match:cancel': (jobId: string) => { const s = matchJobs.get(jobId); if (s) s.cancelled = true; return true; },
+  'match:colors': (file: string, times: number[], still: boolean) => sampleColors(file, times, still),
   'lut:pick': async () => {
     const r = await dialog.showOpenDialog(win!, { title: 'Import LUT', properties: ['openFile'], filters: [{ name: '3D LUT', extensions: ['cube'] }] });
     if (r.canceled) return null;

@@ -193,7 +193,18 @@ function videoChain(p: Project, s: VideoSegment, i: number, from: number, to: nu
   const [cl, ct, cr, cb] = pl.crop;
   const parts = [`[${k}:v]${pre.length ? pre.join(',') + ',' : ''}setsar=1`];
   if (cl || ct || cr || cb) parts.push(`crop=w=iw*${num(1 - cl - cr)}:h=ih*${num(1 - ct - cb)}:x=iw*${num(cl)}:y=ih*${num(ct)}`);
-  parts.push(`scale=${even(pl.w)}:${even(pl.h)}:flags=bicubic`);
+  if (c.motion && c.kind === 'media') {
+    // Animated zoom/pan: scale up so the moving window fills the picture size, then crop it out
+    const PW = even(pl.w), PH = even(pl.h);
+    const u = `clip((${num(f0 - c.start)}+t*${num(fps)})/${num(Math.max(1, c.duration - 1))}\\,0\\,1)`;
+    const lerp = (a: number, b: number) => `(${num(a)}+${num(b - a)}*${u})`;
+    const { from: A, to: B } = c.motion;
+    parts.push(`scale=w='2*ceil(${PW}/${lerp(A.w, B.w)}/2)':h='2*ceil(${PH}/${lerp(A.h, B.h)}/2)':eval=frame:flags=bicubic`);
+    // crop evaluates x/y per frame but keeps its initial input size, so position from t alone
+    parts.push(`crop=w=${PW}:h=${PH}:x='${lerp(A.x, B.x)}*${PW}/${lerp(A.w, B.w)}':y='${lerp(A.y, B.y)}*${PH}/${lerp(A.h, B.h)}'`);
+  } else {
+    parts.push(`scale=${even(pl.w)}:${even(pl.h)}:flags=bicubic`);
+  }
   const lut = assets.luts[c.id];
   if (lut) parts.push('format=rgb24', `lut3d=file='${escPath(lut)}':interp=tetrahedral`);
   parts.push('format=rgba');

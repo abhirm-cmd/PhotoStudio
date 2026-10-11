@@ -78,7 +78,7 @@ function MotionSection({ c }: { c: Clip }) {
   const tf = (label: string, patch: Partial<Clip['transform']>, key: string) => set(label, x => Object.assign(x.transform, patch), key);
   const fps = useProject(s => s.project.settings.fps);
   return (
-    <Section id="i-motion" title="Motion & opacity" onReset={() => set('Reset motion', x => { x.transform = defaultTransform(); x.opacity = 1; })}>
+    <Section id="i-motion" title="Motion & opacity" onReset={() => set('Reset motion', x => { x.transform = defaultTransform(); x.opacity = 1; x.motion = null; })}>
       <Slider label="Scale" value={Math.round(t.scale * 100)} min={5} max={400} defaultValue={100} format={v => `${Math.round(v)}%`} onChange={v => tf('Scale', { scale: v / 100 }, 'scale')} />
       <Slider label="Position X" value={t.x} min={-2000} max={2000} defaultValue={0} onChange={v => tf('Position', { x: v }, 'px')} />
       <Slider label="Position Y" value={t.y} min={-2000} max={2000} defaultValue={0} onChange={v => tf('Position', { y: v }, 'py')} />
@@ -92,6 +92,13 @@ function MotionSection({ c }: { c: Clip }) {
         <button className={`btn sm${t.flipH ? ' active' : ''}`} onClick={() => tf('Flip', { flipH: !t.flipH }, '')}><FlipHorizontal2 size={13} />Flip H</button>
         <button className={`btn sm${t.flipV ? ' active' : ''}`} onClick={() => tf('Flip', { flipV: !t.flipV }, '')}><FlipVertical2 size={13} />Flip V</button>
       </div>
+      {c.motion && <>
+        <div className="subhead">Zoom/pan move</div>
+        <div className="row small">
+          <span className="grow">{(() => { const z = c.motion.from.w / c.motion.to.w; return `${z > 1.01 ? `Zooms in ${Math.round((z - 1) * 100)}%` : z < 0.99 ? `Zooms out ${Math.round((1 / z - 1) * 100)}%` : 'Pans'} over the clip`; })()}</span>
+          <button className="btn sm" onClick={() => set('Remove move', x => { x.motion = null; })}>Remove</button>
+        </div>
+      </>}
       <div className="subhead">Opacity & fades</div>
       <Slider label="Opacity" value={Math.round(c.opacity * 100)} min={0} max={100} defaultValue={100} format={v => `${Math.round(v)}%`} onChange={v => set('Opacity', x => { x.opacity = v / 100; }, 'op')} />
       <Slider label="Fade in" value={c.fadeIn / fps} min={0} max={Math.min(10, c.duration / fps)} step={0.05} defaultValue={0} format={v => `${v.toFixed(2)} s`} onChange={v => set('Fade in', x => { x.fadeIn = Math.round(v * fps); }, 'fi')} />

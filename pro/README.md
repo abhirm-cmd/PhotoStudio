@@ -16,6 +16,20 @@
 
 Projects (`.psproj`, JSON) save atomically with a `.bak` copy, autosave every 20 seconds and offer recovery after a crash. Closing or opening another project with unsaved changes asks first. Formats the built-in player can't decode (ProRes, HEVC, DNxHD, MXF…) get a 720p H.264 preview proxy automatically; export always reads the original.
 
+### Match Edit
+
+**Match Edit** (Edit page, timeline toolbar) uses a video you've already edited as a template. Pick the reference and your new footage, and it rebuilds the same edit on the timeline:
+
+- Every cut lands on the same frame as in the reference, so shot lengths match exactly.
+- Dissolves (with their length), dips to black, and the fade in and fade out are copied.
+- Zoom-in, zoom-out and pan moves within a shot are measured and replayed as animated crops on the new clip.
+- The reference's look (exposure, contrast, saturation, white balance, black level) can be matched as a grade.
+- The reference's soundtrack can be used, so cuts stay on the beat. You can also keep the footage's own sound, use both, or use none.
+
+Shots are dealt to your clips in the order you tick them and spread through each clip. Everything it creates is ordinary clip settings you can change, and the whole build is one undo step.
+
+Analysis runs on this computer with FFmpeg. Nothing is uploaded. Speed changes in the reference can't be told apart from normal footage, so clips play at 100 %.
+
 ### Preview equals export
 
 The program monitor and the exporter share one description of the timeline (`src/shared/timeline.ts`): which clips are visible at each frame, transition and fade ramps, picture placement and the color grade, which is baked into a 33³ 3D LUT used as a GPU texture in the preview and by FFmpeg's `lut3d` on export. The end-to-end test compares preview and rendered frames.
@@ -35,7 +49,7 @@ Keyboard shortcuts are listed in the app (Ctrl/⌘ + /): Space, J/K/L, I/O, `,` 
 
 ## Known limits
 
-- No keyframes yet: transforms, opacity and grades are constant per clip (fades and transitions animate).
+- No keyframes yet: transforms, opacity and grades are constant per clip. Fades, transitions and Match Edit zoom/pan moves animate.
 - Reverse shuttle (J) steps frame by frame rather than playing smoothly.
 - Grades are primary corrections per clip; there are no power windows or node graphs.
 - Titles are single text blocks (font, size, weight, color, alignment, position, box, shadow).

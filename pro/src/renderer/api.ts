@@ -1,6 +1,7 @@
 /** Typed bridge to the Electron main process (exposed by preload as window.psp). */
 import type { MediaItem, Project } from '@shared/project';
 import type { ExportOptions, BuiltCommand } from '@shared/ffgraph';
+import type { RefAnalysis } from '@shared/matchedit';
 
 interface Bridge {
   call(method: string, ...args: any[]): Promise<any>;
@@ -31,6 +32,9 @@ export const api = {
   exists: (paths: string[]) => call<boolean[]>('media:exists', paths),
   relink: (name: string) => call<Probed | null>('media:relink', name),
   reveal: (p: string) => call('media:reveal', p),
+  analyzeReference: (jobId: string, file: string) => call<RefAnalysis>('match:analyze', jobId, file),
+  cancelAnalyze: (jobId: string) => call('match:cancel', jobId),
+  sampleColors: (file: string, times: number[], still: boolean) => call<number[]>('match:colors', file, times, still),
   pickLut: () => call<{ path: string; name: string; text: string } | null>('lut:pick'),
   readLut: (p: string) => call<string | null>('lut:read', p),
   saveStill: (png: Uint8Array, name: string) => call<string | null>('still:save', png, name),

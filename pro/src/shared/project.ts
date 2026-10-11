@@ -73,6 +73,9 @@ export interface Transform {
   flipV: boolean;
 }
 
+/** A crop window in fractions of the source picture (Match Edit zoom/pan moves) */
+export interface MotionRect { x: number; y: number; w: number; h: number }
+
 export type TransitionType = 'dissolve' | 'dip' | 'slide';
 export interface Transition { type: TransitionType; duration: number }
 
@@ -114,6 +117,8 @@ export interface Clip {
   transform: Transform;
   grade: Grade;
   transitionIn?: Transition | null;
+  /** Animated zoom/pan: the visible window of the source moves from `from` to `to` over the clip */
+  motion?: { from: MotionRect; to: MotionRect } | null;
   title?: TitleSpec;
   color?: string;
   // audio
@@ -169,7 +174,7 @@ export function newProject(name = 'Untitled', settings: Partial<ProjectSettings>
 export function newClip(p: Partial<Clip> & Pick<Clip, 'trackId' | 'kind' | 'start' | 'duration'>): Clip {
   return {
     id: uid('c'), name: 'Clip', srcIn: 0, speed: 1, enabled: true, linkId: null, opacity: 1,
-    transform: defaultTransform(), grade: defaultGrade(), transitionIn: null, volume: 0, fadeIn: 0, fadeOut: 0, ...p,
+    transform: defaultTransform(), grade: defaultGrade(), transitionIn: null, motion: null, volume: 0, fadeIn: 0, fadeOut: 0, ...p,
   };
 }
 

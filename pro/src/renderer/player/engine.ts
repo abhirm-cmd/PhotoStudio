@@ -320,7 +320,7 @@ export class ProgramEngine {
       if (!source) continue;
       const lut = c.kind === 'media' ? gradeLut(c.grade, this.invalidate) : null;
       if (lut === undefined) pending++;
-      const pl = placement(p, c, sw, sh);
+      const pl = placement(p, c, sw, sh, frame);
       draw.push({
         source, key, dynamic,
         center: [pl.cx + L.slide * p.settings.width, pl.cy], size: [pl.w, pl.h], rotation: pl.rotation,

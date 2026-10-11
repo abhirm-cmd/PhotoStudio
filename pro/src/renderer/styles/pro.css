@@ -258,3 +258,20 @@
 .shortcut-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 24px; }
 .sc { display: flex; gap: 10px; align-items: center; font-size: 12px; }
 .sc-keys { width: 150px; flex-shrink: 0; }
+
+/* ------------------------------------------------------------ Match Edit */
+.match-edit { display: flex; flex-direction: column; gap: 14px; min-width: min(640px, 80vw); }
+.match-edit .row { display: flex; gap: 8px; align-items: center; }
+.match-analysis { display: flex; flex-direction: column; gap: 8px; min-height: 22px; }
+.shot-strip { display: flex; gap: 2px; height: 26px; border-radius: 6px; overflow: hidden; }
+.shot-strip .shot { flex-basis: 0; min-width: 6px; display: flex; align-items: center; justify-content: center; gap: 2px; background: var(--bg-3); color: var(--text-1); }
+.shot-strip .shot:nth-child(odd) { background: var(--bg-4); }
+.shot-strip .shot.tr-dissolve { box-shadow: inset 4px 0 0 var(--accent); }
+.shot-strip .shot.tr-dip { box-shadow: inset 4px 0 0 #000; }
+.match-footage { display: flex; flex-direction: column; gap: 2px; max-height: 200px; overflow: auto; border: 1px solid var(--line-2); border-radius: 6px; padding: 4px; }
+.match-item { display: flex; align-items: center; gap: 8px; padding: 4px 6px; border-radius: 4px; cursor: pointer; }
+.match-item:hover { background: var(--bg-hover); }
+.match-item.on { background: var(--accent-soft); }
+.match-item .nm { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.match-num { width: 16px; text-align: center; font-variant-numeric: tabular-nums; color: var(--accent); font-weight: 600; }
+.match-options { display: flex; flex-direction: column; gap: 6px; }
